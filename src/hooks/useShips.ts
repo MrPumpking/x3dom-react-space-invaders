@@ -10,7 +10,14 @@ const createShip = ({ x, y, z }: Omit<ShipProps, "id">): ShipProps => ({
   z,
 });
 
-export const useShips = () => {
+interface UseShipsProps {
+  onShipLineCross(): void;
+}
+
+const SHIP_CROSS_LINE = 60;
+const SHIP_MOVE_SPEED = 0.1;
+
+export const useShips = ({ onShipLineCross }: UseShipsProps) => {
   const [explosions, setExplosions] = useState<ExplosionProps[]>([]);
   const [ships, setShips] = useState<ShipProps[]>(
     Array.from({ length: 5 }).map((_, idx) =>
@@ -20,13 +27,26 @@ export const useShips = () => {
 
   useEffect(() => {
     const id = setInterval(() => {
-      setShips((ships) => ships.map((ship) => ({ ...ship, y: ship.y + 0.1 })));
+      const newShips = ships.map((ship) => {
+        const newY = ship.y + SHIP_MOVE_SPEED;
+
+        if (newY > SHIP_CROSS_LINE) {
+          onShipLineCross();
+          return null;
+        }
+
+        return { ...ship, y: newY };
+      });
+
+      setShips(newShips.filter((ship) => ship !== null) as ShipProps[]);
+
+      // TODO: remove ships that have crossed the line?
     }, 1000 / 60);
 
     return () => {
       clearInterval(id);
     };
-  }, []);
+  }, [onShipLineCross, ships]);
 
   const removeShip = useCallback((ship: ShipProps) => {
     const expId = `exp-${uuid()}`;
