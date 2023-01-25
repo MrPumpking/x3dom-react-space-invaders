@@ -1,13 +1,18 @@
 import { FC, useEffect, useState } from "react";
 import { Ship } from "./entities/Ship";
+import styles from "./App.module.css";
+
+const CAMERA_STEP = 1;
 
 export const App: FC = () => {
+  const [position, setPosition] = useState({ x: 0, y: 0, z: 0 });
+
   const [ships, setShips] = useState(
     Array.from({ length: 5 }).map((_, idx) => ({
       id: `ship-${idx}`,
-      x: 10 + idx * 5,
-      z: idx > 2 ? 10 : 0,
-      y: 0,
+      x: idx * 5,
+      z: 0,
+      y: -20,
     }))
   );
 
@@ -19,6 +24,23 @@ export const App: FC = () => {
     return () => {
       clearInterval(id);
     };
+  }, []);
+
+  useEffect(() => {
+    const handler = (event: KeyboardEvent) => {
+      switch (event.key) {
+        case "ArrowLeft":
+          return setPosition((pos) => ({ ...pos, x: pos.x - CAMERA_STEP }));
+        case "ArrowRight":
+          return setPosition((pos) => ({ ...pos, x: pos.x + CAMERA_STEP }));
+        case "ArrowUp":
+          return setPosition((pos) => ({ ...pos, y: pos.y + CAMERA_STEP }));
+        case "ArrowDown":
+          return setPosition((pos) => ({ ...pos, y: pos.y - CAMERA_STEP }));
+      }
+    };
+    document.addEventListener("keydown", handler);
+    return () => document.removeEventListener("keydown", handler);
   }, []);
 
   return (
@@ -90,18 +112,10 @@ export const App: FC = () => {
         </transform>
         <viewpoint
           id="camera"
-          def="camera1"
-          description="camera 1"
-          fieldofview=".9599"
-          orientation="1 0 1 -.2618"
-          position=".5 -5 12"
+          position={`${position.x} ${position.y} ${position.z}`}
+          // position=".10 -5 12"
         />
-        <viewpoint def="VP" fieldofview="1" position="0 5 0" />
-        <navigationinfo type="FLY" />
-
-        <timesensor def="Timer" loop="true" />
-        <proximitysensor def="Proxi" size="1.0E30 1.0E30 1.0E30" />
-
+        <navigationinfo type="explore" />
         <transform def="fleet" rotation="1 0 0 1.57">
           {ships.map((ship) => (
             <Ship
@@ -114,7 +128,7 @@ export const App: FC = () => {
           ))}
         </transform>
 
-        <timesensor def="Clock" cycleInterval="10.0" loop="true" />
+        {/* <timesensor def="Clock" cycleInterval="10.0" loop="true" />
 
         <script def="moveScript">
           <field
@@ -152,7 +166,7 @@ export const App: FC = () => {
           fromField="value_changed"
           toNode="fleet"
           toField="set_translation"
-        />
+        /> */}
       </scene>
     </x3d>
   );
