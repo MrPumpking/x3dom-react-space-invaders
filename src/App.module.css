@@ -26,4 +26,5 @@
 
 .gameOver[data-visible="true"] {
   display: grid;
+  font-family: sans-serif;
 }

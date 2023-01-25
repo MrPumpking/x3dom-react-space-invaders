@@ -6,7 +6,7 @@ import { usePlayerController } from "./hooks/usePlayerController";
 import { useShips } from "./hooks/useShips";
 import styles from "./App.module.css";
 
-const BASE_HEALTH = 4;
+const BASE_HEALTH = 10;
 
 export const App: FC = () => {
   const [health, setHealth] = useState(BASE_HEALTH);
