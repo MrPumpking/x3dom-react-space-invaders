@@ -1,30 +1,12 @@
-import { FC, useEffect, useState } from "react";
+import { FC } from "react";
+import { Missile } from "./entities/Missile";
 import { Ship } from "./entities/Ship";
-import styles from "./App.module.css";
+import { usePlayerController } from "./hooks/usePlayerController";
 import { useShips } from "./hooks/useShips";
 
-const CAMERA_STEP = 1;
-
 export const App: FC = () => {
-  const [position, setPosition] = useState({ x: 0, y: 0, z: 0 });
   const { ships, removeShip } = useShips();
-
-  useEffect(() => {
-    const handler = (event: KeyboardEvent) => {
-      switch (event.key) {
-        case "ArrowLeft":
-          return setPosition((pos) => ({ ...pos, x: pos.x - CAMERA_STEP }));
-        case "ArrowRight":
-          return setPosition((pos) => ({ ...pos, x: pos.x + CAMERA_STEP }));
-        case "ArrowUp":
-          return setPosition((pos) => ({ ...pos, y: pos.y + CAMERA_STEP }));
-        case "ArrowDown":
-          return setPosition((pos) => ({ ...pos, y: pos.y - CAMERA_STEP }));
-      }
-    };
-    document.addEventListener("keydown", handler);
-    return () => document.removeEventListener("keydown", handler);
-  }, []);
+  const { position, missiles } = usePlayerController();
 
   return (
     <x3d profile="Immersive">
@@ -107,6 +89,10 @@ export const App: FC = () => {
         <transform rotation="1.1 0 0 1.5">
           <Ship id="player" x={0 + position.x} y={57} z={1 - position.y} />
         </transform>
+        {/* <Missile id="asd" x={0} y={-0.5} z={-2.8} /> */}
+        {missiles.map((missile) => (
+          <Missile key={missile.id} {...missile} />
+        ))}
       </scene>
     </x3d>
   );
