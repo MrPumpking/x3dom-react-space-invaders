@@ -1,12 +1,16 @@
 import { FC } from "react";
+import { Explosion } from "./entities/Explosion";
 import { Missile } from "./entities/Missile";
 import { Ship } from "./entities/Ship";
 import { usePlayerController } from "./hooks/usePlayerController";
 import { useShips } from "./hooks/useShips";
 
 export const App: FC = () => {
-  const { ships, removeShip } = useShips();
-  const { position, missiles } = usePlayerController();
+  const { ships, explosions, removeShip } = useShips();
+  const { position, missiles } = usePlayerController({
+    ships,
+    onShipHit: removeShip,
+  });
 
   return (
     <x3d profile="Immersive">
@@ -72,13 +76,12 @@ export const App: FC = () => {
         <transform scale="1 0.03 0.3" translation="-150 0 -500">
           <shape>
             <circle2d radius="400" />
-            <appearance USE="MagentaAppearance" />
+            <appearance use="MagentaAppearance" />
           </shape>
         </transform>
         <viewpoint
           id="camera"
           position={`${position.x} ${position.y} ${position.z}`}
-          // position=".10 -5 12"
         />
         <navigationinfo type="explore" />
         <transform def="fleet" rotation="1 0 0 1.5">
@@ -89,10 +92,13 @@ export const App: FC = () => {
         <transform rotation="1.1 0 0 1.5">
           <Ship id="player" x={0 + position.x} y={57} z={1 - position.y} />
         </transform>
-        {/* <Missile id="asd" x={0} y={-0.5} z={-2.8} /> */}
         {missiles.map((missile) => (
           <Missile key={missile.id} {...missile} />
         ))}
+        {explosions.map((explosion) => (
+          <Explosion key={explosion.id} {...explosion} />
+        ))}
+        {/* <Explosion id="asd" x={0} y={-4} z={-20} /> */}
       </scene>
     </x3d>
   );

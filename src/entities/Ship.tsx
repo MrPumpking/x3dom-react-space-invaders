@@ -1,10 +1,8 @@
 import { FC, useEffect } from "react";
+import { Vector3D } from "../types/Vector3D";
 
-interface ShipProps {
+export interface ShipProps extends Vector3D {
   id: string;
-  x: number;
-  y: number;
-  z: number;
   onClick?(): void;
 }
 
@@ -30,7 +28,7 @@ export const Ship: FC<ShipProps> = ({ id, x, y, z, onClick, ...restProps }) => {
           <shape>
             <sphere radius="0.14" />
             <appearance def="Cockpit">
-              <material emissiveColor="0 0 1" transparency="0.55" />
+              <material emissivecolor="0 0 1" transparency="0.55" />
             </appearance>
           </shape>
         </transform>
@@ -38,7 +36,7 @@ export const Ship: FC<ShipProps> = ({ id, x, y, z, onClick, ...restProps }) => {
           <shape>
             <sphere def="Pilot" radius="0.16" />
             <appearance>
-              <material diffuseColor="1.0 0.0 0.0" />
+              <material diffusecolor="1.0 0.0 0.0" />
             </appearance>
           </shape>
         </transform>
@@ -46,50 +44,50 @@ export const Ship: FC<ShipProps> = ({ id, x, y, z, onClick, ...restProps }) => {
           <shape>
             <sphere radius="0.4" />
             <appearance>
-              <material diffuseColor="0.8 0.7 0.3" />
+              <material diffusecolor="0.8 0.7 0.3" />
             </appearance>
           </shape>
         </transform>
         <transform rotation="1 0 0 3.14" translation="0.5 -62.0 0.0">
           <shape def="Afterburner">
-            <cone bottomRadius="0.25" height="0.9" />
+            <cone bottomradius="0.25" height="0.9" />
             <appearance>
-              <material diffuseColor="1.0 0.2 0.2" transparency="0.5" />
+              <material diffusecolor="1.0 0.2 0.2" transparency="0.5" />
             </appearance>
           </shape>
         </transform>
         <transform rotation="1 0 0 3.14" translation="-0.5 -62.0 0.0">
-          <shape USE="Afterburner" />
+          <shape use="Afterburner" />
         </transform>
         <transform translation=".5 -61 0">
           <shape def="Engine">
             <cylinder bottom="false" radius=".25" />
             <appearance>
-              <material diffuseColor="0.8 0.7 0.3" />
+              <material diffusecolor="0.8 0.7 0.3" />
             </appearance>
           </shape>
         </transform>
         <transform translation="-0.5 -61 0">
-          <shape USE="Engine" />
+          <shape use="Engine" />
         </transform>
         <transform scale="9 1 1" translation="0.0 -60 0.0">
           <shape def="Wing">
             <appearance>
-              <material diffuseColor="0.8 0.7 0.3" />
+              <material diffusecolor="0.8 0.7 0.3" />
             </appearance>
-            <cone bottomRadius="0.2" height="2.8" />
+            <cone bottomradius="0.2" height="2.8" />
           </shape>
         </transform>
         <transform scale="1 3 1" translation="1.0 -60.6 0.2">
           <shape def="Bomb">
             <sphere radius=".1" />
             <appearance>
-              <material diffuseColor="0 0.8 0" />
+              <material diffusecolor="0 0.8 0" />
             </appearance>
           </shape>
         </transform>
         <transform scale="1 3 1" translation="-1.0 -60.6 0.2">
-          <shape USE="Bomb" />
+          <shape use="Bomb" />
         </transform>
       </group>
     </transform>

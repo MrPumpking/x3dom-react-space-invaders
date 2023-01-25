@@ -1,24 +1,44 @@
 import { useCallback, useEffect, useState } from "react";
-import { MissileProps } from "../entities/Missile";
 import { v4 as uuid } from "uuid";
+import { MissileProps } from "../entities/Missile";
+import { ShipProps } from "../entities/Ship";
+import { areIntersecting, getMissileBB, getShipBB } from "./utils";
 
 const CAMERA_STEP = 1;
 const MISSILE_STEP = 1;
 const MISSILE_Z_CUTOFF = -60;
 
-export const usePlayerController = () => {
+const createMissile = ({
+  x,
+  y,
+  z,
+}: Omit<MissileProps, "id">): MissileProps => ({
+  id: `missile-${uuid()}`,
+  x,
+  y,
+  z,
+});
+
+interface UsePlayerControllerProps {
+  ships: ShipProps[];
+  onShipHit(ship: ShipProps): void;
+}
+
+export const usePlayerController = ({
+  ships,
+  onShipHit,
+}: UsePlayerControllerProps) => {
   const [position, setPosition] = useState({ x: 0, y: 0, z: 0 });
   const [missiles, setMissiles] = useState<MissileProps[]>([]);
 
   const spawnMissile = useCallback(() => {
     setMissiles((missiles) => [
       ...missiles,
-      {
-        id: uuid(),
+      createMissile({
         x: 0 + position.x,
         y: -0.5 + position.y,
         z: -2.8 + position.z,
-      },
+      }),
     ]);
   }, [position.x, position.y, position.z]);
 
@@ -41,23 +61,36 @@ export const usePlayerController = () => {
     return () => document.removeEventListener("keydown", handler);
   }, [spawnMissile]);
 
-  useEffect(() => {
-    const moveMissiles = () => {
-      for (const missile of missiles) {
-        missile.z -= MISSILE_STEP;
+  const moveMissiles = useCallback(() => {
+    for (const missile of missiles) {
+      // Move missiles
+      missile.z -= MISSILE_STEP;
 
-        if (missile.z <= MISSILE_Z_CUTOFF) {
+      // Check if the missiles are too far
+      if (missile.z <= MISSILE_Z_CUTOFF) {
+        setMissiles((missiles) => missiles.filter((m) => m.id !== missile.id));
+        continue;
+      }
+
+      // Check for collisions
+      for (const ship of ships) {
+        // TODO: fix collision detection
+        if (areIntersecting(getShipBB(ship), getMissileBB(missile))) {
           setMissiles((missiles) =>
             missiles.filter((m) => m.id !== missile.id)
           );
+          onShipHit(ship);
         }
       }
-    };
+    }
+  }, [missiles, onShipHit, ships]);
 
-    moveMissiles();
-    const id = setInterval(moveMissiles, 1000 / 60);
+  useEffect(() => {
+    const id = setInterval(() => {
+      moveMissiles();
+    }, 1000 / 60);
     return () => clearInterval(id);
-  }, [missiles]);
+  }, [moveMissiles]);
 
   return { position, missiles };
 };
