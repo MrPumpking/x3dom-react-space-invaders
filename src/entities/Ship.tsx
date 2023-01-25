@@ -5,7 +5,7 @@ interface ShipProps {
   x: number;
   y: number;
   z: number;
-  onClick(): void;
+  onClick?(): void;
 }
 
 const HANDLERS_KEY = "shipHandlers";

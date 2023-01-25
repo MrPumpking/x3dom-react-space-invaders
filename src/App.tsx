@@ -1,30 +1,13 @@
 import { FC, useEffect, useState } from "react";
 import { Ship } from "./entities/Ship";
 import styles from "./App.module.css";
+import { useShips } from "./hooks/useShips";
 
 const CAMERA_STEP = 1;
 
 export const App: FC = () => {
   const [position, setPosition] = useState({ x: 0, y: 0, z: 0 });
-
-  const [ships, setShips] = useState(
-    Array.from({ length: 5 }).map((_, idx) => ({
-      id: `ship-${idx}`,
-      x: idx * 5,
-      z: 0,
-      y: -20,
-    }))
-  );
-
-  useEffect(() => {
-    const id = setInterval(() => {
-      setShips((ships) => ships.map((ship) => ({ ...ship, y: ship.y + 0.1 })));
-    }, 1000 / 60);
-
-    return () => {
-      clearInterval(id);
-    };
-  }, []);
+  const { ships, removeShip } = useShips();
 
   useEffect(() => {
     const handler = (event: KeyboardEvent) => {
@@ -116,57 +99,14 @@ export const App: FC = () => {
           // position=".10 -5 12"
         />
         <navigationinfo type="explore" />
-        <transform def="fleet" rotation="1 0 0 1.57">
+        <transform def="fleet" rotation="1 0 0 1.5">
           {ships.map((ship) => (
-            <Ship
-              {...ship}
-              key={ship.id}
-              onClick={() =>
-                setShips((ships) => ships.filter((s) => s.id !== ship.id))
-              }
-            />
+            <Ship {...ship} key={ship.id} onClick={() => removeShip(ship)} />
           ))}
         </transform>
-
-        {/* <timesensor def="Clock" cycleInterval="10.0" loop="true" />
-
-        <script def="moveScript">
-          <field
-            name="set_fraction"
-            type="SFFloat"
-            accessType="inputOnly"
-            appinfo="receive fraction from clock"
-          />
-          <field
-            name="value_changed"
-            type="SFVec3f"
-            accessType="outputOnly"
-            appinfo="produce output position to move the ball"
-          />
-          {`
-        <![CDATA[
-            ecmascript:
-            // Move a shape in a straight path
-            function set_fraction( fraction, eventTime ) {
-            	value_changed[0] = 0.0;    // X component
-            	value_changed[1] = 0.0;         // Y component
-            	value_changed[2] = value_changed[2] + 0.1;         // Z component
-            }
-            ]]>
-            `}
-        </script>
-        <route
-          fromNode="Clock"
-          fromField="fraction_changed"
-          toNode="moveScript"
-          toField="set_fraction"
-        />
-        <route
-          fromNode="moveScript"
-          fromField="value_changed"
-          toNode="fleet"
-          toField="set_translation"
-        /> */}
+        <transform rotation="1.1 0 0 1.5">
+          <Ship id="player" x={0 + position.x} y={57} z={1 - position.y} />
+        </transform>
       </scene>
     </x3d>
   );
